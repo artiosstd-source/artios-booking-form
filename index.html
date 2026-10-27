@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Package Booking Form - Artios Lumina Studio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f8fafc; color: #0f172a; padding: 24px 12px; line-height: 1.5; }
+    .container { max-width: 700px; margin: 0 auto; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #e2e8f0; }
+    
+    .header { background: #ffffff; padding: 32px 20px; text-align: center; border-bottom: 3px solid #f59e0b; }
+    .header h1 { font-size: 24px; font-weight: 900; letter-spacing: 1px; color: #0f172a; text-transform: uppercase; }
+    .header h1 span { color: #f59e0b; }
+    .header p.address { font-size: 11px; color: #64748b; margin-top: 6px; text-transform: uppercase; font-weight: 600; line-height: 1.6; }
+    .header h2 { font-size: 18px; color: #1e293b; margin-top: 16px; font-weight: 700; }
+    .header p.desc { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+    .form-body { padding: 28px; }
+    .section-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+    .section-title { font-size: 14px; font-weight: 800; color: #2563eb; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; text-transform: uppercase; letter-spacing: 0.5px; }
+    
+    .step-hidden { display: none; }
+    
+    .total-price-box { background: #f0fdf4; border: 2px solid #16a34a; border-radius: 10px; padding: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .total-price-box .label { font-size: 13px; font-weight: 800; color: #166534; text-transform: uppercase; }
+    .total-price-box .amount { font-size: 20px; font-weight: 900; color: #16a34a; }
+
+    .deposit-preview { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 11px; color: #166534; display: block; }
+    .installment-preview { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 11px; color: #1e3a8a; display: none; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px; text-transform: uppercase; }
+    .form-group label span { color: #ef4444; }
+    .form-control { width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; color: #0f172a; font-size: 13px; outline: none; }
+    .form-control:focus { border-color: #2563eb; background: #ffffff; }
+    .form-control:disabled { background: #f1f5f9; color: #64748b; cursor: not-allowed; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* Custom Scroll Time Picker Style */
+    .time-picker-wrapper { display: flex; gap: 8px; align-items: center; }
+    .time-select { flex: 1; padding: 10px 8px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-weight: 600; color: #0f172a; outline: none; text-align: center; cursor: pointer; }
+    .time-select:focus { border-color: #2563eb; background: #ffffff; }
+
+    .location-note { font-size: 11px; color: #2563eb; margin-top: 4px; font-weight: 600; line-height: 1.4; }
+
+    .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .cal-header button { background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+    .cal-day-name { font-size: 10px; font-weight: 700; color: #64748b; padding-bottom: 6px; }
+    
+    .cal-day { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 4px; font-size: 12px; color: #1e3a8b; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 40px; font-weight: 500; cursor: default; }
+    .cal-day.booked { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .cal-day.booked span.tag { font-size: 8px; font-weight: 800; color: #ef4444; margin-top: 2px; }
+    .cal-day.past { background: #f1f5f9; color: #94a3b8; border-color: #e2e8f0; opacity: 0.5; }
+
+    .category-accordion { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px 16px; margin-top: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; color: #1e293b; text-transform: uppercase; }
+    .category-accordion.active { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+    .category-content { display: none; padding-top: 10px; }
+
+    .radio-card { display: flex; align-items: flex-start; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; }
+    .radio-card:hover { border-color: #2563eb; background: #f0f6ff; }
+    .radio-card input { margin-top: 3px; accent-color: #2563eb; transform: scale(1.1); flex-shrink: 0; }
+    .radio-card .info { width: 100%; display: flex; flex-direction: column; }
+    .radio-card .info h4 { font-size: 13px; font-weight: 800; color: #0f172a; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .radio-card .info h4 .price { color: #2563eb; font-size: 14px; font-weight: 900; white-space: nowrap; margin-left: 8px; }
+    .radio-card .info p { font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.4; display: block; width: 100%; }
+
+    .event-group { margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; }
+    .btn-submit { width: 100%; background: #16a34a; color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; transition: background 0.2s; box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3); margin-top: 20px; }
+    .btn-submit:hover { background: #15803d; }
+    .alert-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 10px; border-radius: 8px; font-size: 11px; text-align: center; font-weight: bold; margin-bottom: 12px; display: none; }
+    
+    footer { text-align: center; padding: 20px; font-size: 10px; color: #64748b; border-top: 1px solid #e2e8f0; background: #f8fafc; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>ARTIOS <span>LUMINA</span> STUDIO</h1>
+      <p class="address">No.11 B Tingkat 2 Jalan Seri Tunku 1, Plaza Seri Tunku, 06000 Jitra Kedah<br>No. SSM: 003661074-U</p>
+      <h2>Package Booking Form</h2>
+      <p class="desc">Sila semak ketersediaan tarikh dan lengkapkan maklumat anda di bawah.</p>
+    </div>
+
+    <form id="bookingForm" class="form-body" onsubmit="submitBooking(event)">
+      
+      <!-- 01. SEMAK KETERSEDIAAN TARIKH (KALENDAR) -->
+      <div class="section-box">
+        <div class="section-title">
+          <span>1. Sila Semak Tarikh Kosong di Kalendar Bawah</span>
+          <span id="calendarLoading" style="font-size: 10px; color: #64748b;">🔄 Sedang sync kalendar...</span>
+        </div>
+        
+        <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
+          <div class="cal-header">
+            <button type="button" onclick="changeMonth(-1)">&larr;</button>
+            <span id="monthYearTitle" style="font-size: 13px; font-weight: bold; color: #0f172a;">Oktober 2026</span>
+            <button type="button" onclick="changeMonth(1)">&rarr;</button>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-day-name">ISN</div><div class="cal-day-name">SEL</div><div class="cal-day-name">RAB</div><div class="cal-day-name">KHA</div><div class="cal-day-name">JUM</div><div class="cal-day-name" style="color:#2563eb">SAB</div><div class="cal-day-name" style="color:#2563eb">AHAD</div>
+          </div>
+          <div id="calDaysGrid" class="cal-grid" style="margin-top: 4px;"></div>
+        </div>
+        
+        <p style="font-size: 11px; color: #64748b; margin-top: 10px; line-height: 1.5;">
+          📌 Kalendar paparan kekosongan slot sahaja. Sila pilih tarikh majlis anda pada ruangan borang di bawah dibahagian Maklumat Acara.
+        </p>
+      </div>
+
+      <!-- 02. MAKLUMAT PELANGGAN -->
+      <div class="section-box">
+        <div class="section-title"><span>02. Maklumat Pelanggan</span></div>
+        <div class="form-group">
+          <label>Full Name <span>*</span></label>
+          <input type="text" id="coupleName" required class="form-control" oninput="checkFormProgress()">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Contact Number <span>*</span></label>
+            <input type="tel" id="contactNumber" required class="form-control" oninput="checkFormProgress()">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" class="form-control">
+          </div>
+        </div>
+      </div>
+
+      <!-- 03. PILIH PAKEJ -->
+      <div id="step-package" class="section-box step-hidden">
+        <div class="section-title"><span>03. Pilih Pakej</span></div>
+
+        <!-- BASIC -->
+        <div class="category-accordion" onclick="toggleAccordion(this, 'cat-basic')"><span>📦 Basic Packages</span><span>▼</span></div>
+        <div id="cat-basic" class="category-content">
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Eternity Nikah Package (RM650)" data-price="650" data-events="nikah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Eternity Nikah Package</span> <span class="price">RM 650</span></h4>
+              <p>• Coverage 3 hour<br>• Unlimited Shots<br>• Google Drive<br>• Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Eternity Sanding Package (RM750)" data-price="750" data-events="walimah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Eternity Sanding Package</span> <span class="price">RM 750</span></h4>
+              <p>• Coverage 4.5 hour<br>• Unlimited Shots<br>• Google Drive<br>• Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Eternity Outdoor Package (RM550)" data-price="550" data-events="outdoor" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Eternity Outdoor Package</span> <span class="price">RM 550</span></h4>
+              <p>• Coverage 3 hour<br>• Unlimited Shots<br>• Google Drive<br>• Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Engagement Package (RM550)" data-price="550" data-events="tunang" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Engagement Package</span> <span class="price">RM 550</span></h4>
+              <p>• Coverage 3 hour<br>• 1x Outdoor Session<br>• Unlimited Shots<br>• Google Drive<br>• Free Edited Photo<br><small style="color:#d97706; font-weight:700;">📌 Outdoor location is based on client location. Outside area transportation charges apply.</small></p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Eternity Nikah + Outdoor (No Album) - RM800" data-price="800" data-events="nikah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Eternity Nikah + Outdoor (No Album)</span> <span class="price">RM 800</span></h4>
+              <p>• Coverage 5 hour<br>• Unlimited Shots<br>• Google Drive<br>• 1x Outdoor session (within the same event district area)<br>• Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Eternity Nikah + Outdoor (With Album) - RM950" data-price="950" data-events="nikah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Eternity Nikah + Outdoor (With Album)</span> <span class="price">RM 950</span></h4>
+              <p>• Coverage 5 hour<br>• Unlimited Shots<br>• Google Drive<br>• 1x Custom Soft Cover Album 8.5" x 11"<br>• 1x Outdoor session (within the same event district area)<br>• Free Edited Photo</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- ESSENTIAL -->
+        <div class="category-accordion" onclick="toggleAccordion(this, 'cat-nikahsanding')"><span>💍 Essential Nikah & Sanding Packages</span><span>▼</span></div>
+        <div id="cat-nikahsanding" class="category-content">
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Essential Nikah & Sanding (1 Day Event) - RM1150" data-price="1150" data-events="nikah,walimah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Essential Nikah & Sanding (1 Day Event)</span> <span class="price">RM 1,150</span></h4>
+              <p>• Coverage 6 1/2 hour<br>• Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• Google Drive<br>• Free Edited Photo<br><small style="color:#d97706; font-weight:700;">⚠️ Nota: Cover Nikah & Sanding dalam 1 Hari sahaja.</small></p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Essential Nikah & Sanding (Different Dates) - RM1200" data-price="1200" data-events="nikah,walimah" data-diff="true" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Essential Nikah & Sanding (Different Dates)</span> <span class="price">RM 1,200</span></h4>
+              <p>• Cover Nikah on subscribed date & Sanding on the following day<br>• Outdoor Session held after Sanding ceremony ends<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• Google Drive • Free Edited Photo</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- SILVER -->
+        <div class="category-accordion" onclick="toggleAccordion(this, 'cat-silver')"><span>🥈 Silver Packages</span><span>▼</span></div>
+        <div id="cat-silver" class="category-content">
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Silver Nikah & Sanding (1 Day Event) - RM1360" data-price="1360" data-events="nikah,walimah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Silver Nikah & Sanding (1 Day Event)</span> <span class="price">RM 1,360</span></h4>
+              <p>• 1x Custom Imagewrap Album 8.5" x 11"<br>• 1x Slip Case<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• 1x USB Drive 16gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Silver Nikah & Sanding (Different Dates) - RM1370" data-price="1370" data-events="nikah,walimah" data-diff="true" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Silver Nikah & Sanding (Different Dates)</span> <span class="price">RM 1,370</span></h4>
+              <p>• Cover Nikah on subscribed date & Sanding on following day<br>• Outdoor session after Sanding ends<br>• 1x Imagewrap Album 8.5" x 11" • 1x Slip Case<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• 1x USB Drive 16gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- GOLD -->
+        <div class="category-accordion" onclick="toggleAccordion(this, 'cat-gold')"><span>🏆 Gold Packages</span><span>▼</span></div>
+        <div id="cat-gold" class="category-content">
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Gold Nikah & Sanding (1 Day Event) - RM1650" data-price="1650" data-events="nikah,walimah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Gold Nikah & Sanding (1 Day Event)</span> <span class="price">RM 1,650</span></h4>
+              <p>• 3 in 1 Package<br>• 1x Custom Luxe Album 11" x 15"<br>• 1x Custom Slipcase<br>• 1x Custom Mounted Wood Framed - 24" x 16"<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• 1x USB Drive 32gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Gold Nikah & Sanding (Different Dates) - RM1660" data-price="1660" data-events="nikah,walimah" data-diff="true" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Gold Nikah & Sanding (Different Dates)</span> <span class="price">RM 1,660</span></h4>
+              <p>• Cover Nikah on subscribed date & Sanding on following day<br>• Outdoor session after Sanding ends<br>• 3 in 1: 1x Luxe Album 11" x 15" • 1x Slipcase • 1x Mounted Wood Framed 24" x 16"<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• 1x USB Drive 32gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- PLATINUM -->
+        <div class="category-accordion" onclick="toggleAccordion(this, 'cat-platinum')"><span>👑 Platinum Packages</span><span>▼</span></div>
+        <div id="cat-platinum" class="category-content">
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Platinum Nikah & Sanding (1 Day Event) - RM1850" data-price="1850" data-events="nikah,walimah" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Platinum Nikah & Sanding (1 Day Event)</span> <span class="price">RM 1,850</span></h4>
+              <p>• 3 in 1 Package<br>• 1x Custom Luxe Album 11" x 15"<br>• 1x Presentation Box<br>• 1x Custom Mounted Wood Framed - 28" x 19"<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• 1x USB Drive 32gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Platinum Nikah & Sanding (Different Dates) - RM1860" data-price="1860" data-events="nikah,walimah" data-diff="true" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Platinum Nikah & Sanding (Different Dates)</span> <span class="price">RM 1,860</span></h4>
+              <p>• Cover Nikah on subscribed date & Sanding on following day<br>• Outdoor session after Sanding ends<br>• 3 in 1: 1x Luxe Album 11" x 15" • Presentation Box • Mounted Wood Framed 28" x 19"<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Free Outdoor session (within the same event district area)<br>• 1x USB Drive 32gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+        </div>
+
+        <!-- COMBO -->
+        <div class="category-accordion" onclick="toggleAccordion(this, 'cat-combo')"><span>💎 Combo Packages (Nikah, Sanding & Tandang)</span><span>▼</span></div>
+        <div id="cat-combo" class="category-content">
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Essential Combo (Nikah, Sanding & Tandang) - RM1650" data-price="1650" data-events="nikah,walimah,tandang" data-diff="true" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Essential Combo (No Album)</span> <span class="price">RM 1,650</span></h4>
+              <p>• 3 Event & Different Dates<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Nikah session • 2x Sanding session<br>• 2x Free outdoor session (within the same event district area)<br>• 1x USB Drive 16gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="selectedPackage" value="Essential Combo With Album (Nikah, Sanding & Tandang) - RM1750" data-price="1750" data-events="nikah,walimah,tandang" data-diff="true" onchange="updateEventVisibility()">
+            <div class="info">
+              <h4><span>Essential Combo With Album</span> <span class="price">RM 1,750</span></h4>
+              <p>• 3 Event & Different Dates<br>• 1x Custom IMAGEWRAP Album 8.5" x 11" • 1x Slip Case<br>• Coverage 6 1/2 hour • Unlimited Shots<br>• 1x Nikah session • 2x Sanding session<br>• 2x Free outdoor session (within the same event district area)<br>• 1x USB Drive 16gb storage • Free Edited Photo</p>
+            </div>
+          </label>
+        </div>
+
+      </div>
+
+      <!-- 04. MAKLUMAT ACARA -->
+      <div id="step-events" class="section-box step-hidden">
+        <div class="section-title"><span>04. Maklumat Acara</span></div>
+        
+        <!-- NIKAH -->
+        <div id="group-nikah" class="event-group" style="display:none;">
+          <p style="font-size: 12px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">• AKAD / NIKAH <span id="nikahDateBadge" style="font-size:10px; color:#d97706;"></span></p>
+          
+          <div class="form-group">
+            <label>Tarikh Majlis Nikah <span>*</span></label>
+            <input type="date" id="selectedNikahDate" class="form-control" onchange="handleNikahDateChange(this.value)">
+          </div>
+
+          <div class="form-group">
+            <label>Alamat Lokasi Nikah <span>*</span></label>
+            <input type="text" id="nikahLoc" class="form-control" placeholder="Masukkan alamat lokasi majlis nikah" oninput="checkFormProgress()">
+            <p class="location-note">📌 Nota: Sila "Share Location" melalui WhatsApp untuk navigasi.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Masa Pilihan <span>*</span></label>
+            <div class="time-picker-wrapper">
+              <select id="nikahHour" class="time-select" onchange="checkFormProgress()">
+                <option value="">Jam</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="nikahMinute" class="time-select" onchange="checkFormProgress()">
+                <option value="00">00 Minit</option>
+                <option value="05">05 Minit</option>
+                <option value="10">10 Minit</option>
+                <option value="15">15 Minit</option>
+                <option value="20">20 Minit</option>
+                <option value="25">25 Minit</option>
+                <option value="30">30 Minit</option>
+                <option value="35">35 Minit</option>
+                <option value="40">40 Minit</option>
+                <option value="45">45 Minit</option>
+                <option value="50">50 Minit</option>
+                <option value="55">55 Minit</option>
+              </select>
+              <select id="nikahSession" class="time-select" onchange="checkFormProgress()">
+                <option value="Pagi">Pagi</option>
+                <option value="Petang" selected>Petang</option>
+                <option value="Malam">Malam</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SANDING -->
+        <div id="group-walimah" class="event-group" style="display:none;">
+          <p style="font-size: 12px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">• SANDING / WALIMAH <span id="sandingDateBadge" style="font-size:10px; color:#d97706;"></span></p>
+          
+          <div class="form-group">
+            <label>Tarikh Majlis Sanding <span>*</span></label>
+            <input type="date" id="selectedSecondDate" class="form-control" onchange="handleSecondDateChange(this.value)">
+          </div>
+
+          <div class="form-group">
+            <label>Alamat Lokasi Sanding <span>*</span></label>
+            <input type="text" id="walimahLoc" class="form-control" placeholder="Masukkan alamat lokasi majlis sanding" oninput="checkFormProgress()">
+            <p class="location-note">📌 Nota: Sila "Share Location" melalui WhatsApp untuk navigasi.</p>
+          </div>
+          
+          <div class="form-group">
+            <label>Masa Pilihan <span>*</span></label>
+            <div class="time-picker-wrapper">
+              <select id="walimahHour" class="time-select" onchange="checkFormProgress()">
+                <option value="">Jam</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="walimahMinute" class="time-select" onchange="checkFormProgress()">
+                <option value="00">00 Minit</option>
+                <option value="05">05 Minit</option>
+                <option value="10">10 Minit</option>
+                <option value="15">15 Minit</option>
+                <option value="20">20 Minit</option>
+                <option value="25">25 Minit</option>
+                <option value="30">30 Minit</option>
+                <option value="35">35 Minit</option>
+                <option value="40">40 Minit</option>
+                <option value="45">45 Minit</option>
+                <option value="50">50 Minit</option>
+                <option value="55">55 Minit</option>
+              </select>
+              <select id="walimahSession" class="time-select" onchange="checkFormProgress()">
+                <option value="Pagi">Pagi</option>
+                <option value="Petang" selected>Petang</option>
+                <option value="Malam">Malam</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TANDANG -->
+        <div id="group-tandang" class="event-group" style="display:none;">
+          <p style="font-size: 12px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">• TANDANG <span id="tandangDateBadge" style="font-size:10px; color:#d97706;"></span></p>
+          
+          <div class="form-group">
+            <label>Tarikh Majlis Tandang <span>*</span></label>
+            <input type="date" id="selectedTandangDate" class="form-control" onchange="handleTandangDateChange(this.value)">
+          </div>
+
+          <div class="form-group">
+            <label>Alamat Lokasi Tandang <span>*</span></label>
+            <input type="text" id="tandangLoc" class="form-control" placeholder="Masukkan alamat lokasi majlis tandang" oninput="checkFormProgress()">
+            <p class="location-note">📌 Nota: Sila "Share Location" melalui WhatsApp untuk navigasi.</p>
+          </div>
+          
+          <div class="form-group">
+            <label>Masa Pilihan <span>*</span></label>
+            <div class="time-picker-wrapper">
+              <select id="tandangHour" class="time-select" onchange="checkFormProgress()">
+                <option value="">Jam</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="tandangMinute" class="time-select" onchange="checkFormProgress()">
+                <option value="00">00 Minit</option>
+                <option value="05">05 Minit</option>
+                <option value="10">10 Minit</option>
+                <option value="15">15 Minit</option>
+                <option value="20">20 Minit</option>
+                <option value="25">25 Minit</option>
+                <option value="30">30 Minit</option>
+                <option value="35">35 Minit</option>
+                <option value="40">40 Minit</option>
+                <option value="45">45 Minit</option>
+                <option value="50">50 Minit</option>
+                <option value="55">55 Minit</option>
+              </select>
+              <select id="tandangSession" class="time-select" onchange="checkFormProgress()">
+                <option value="Pagi">Pagi</option>
+                <option value="Petang" selected>Petang</option>
+                <option value="Malam">Malam</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTDOOR -->
+        <div id="group-outdoor" class="event-group" style="display:none;">
+          <p style="font-size: 12px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">• OUTDOOR SESSION <span id="outdoorDateBadge" style="font-size:10px; color:#d97706;"></span></p>
+          
+          <div class="form-group">
+            <label>Tarikh Sesi Outdoor <span>*</span></label>
+            <input type="date" id="selectedOutdoorDate" class="form-control" onchange="handleOutdoorDateChange(this.value)">
+          </div>
+
+          <div class="form-group">
+            <label>Alamat Lokasi Outdoor <span>*</span></label>
+            <input type="text" id="outdoorLoc" class="form-control" placeholder="Masukkan alamat lokasi outdoor" oninput="checkFormProgress()">
+            <p class="location-note">📌 Nota: Sila "Share Location" melalui WhatsApp untuk navigasi.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Masa Pilihan <span>*</span></label>
+            <div class="time-picker-wrapper">
+              <select id="outdoorHour" class="time-select" onchange="checkFormProgress()">
+                <option value="">Jam</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="outdoorMinute" class="time-select" onchange="checkFormProgress()">
+                <option value="00">00 Minit</option>
+                <option value="05">05 Minit</option>
+                <option value="10">10 Minit</option>
+                <option value="15">15 Minit</option>
+                <option value="20">20 Minit</option>
+                <option value="25">25 Minit</option>
+                <option value="30">30 Minit</option>
+                <option value="35">35 Minit</option>
+                <option value="40">40 Minit</option>
+                <option value="45">45 Minit</option>
+                <option value="50">50 Minit</option>
+                <option value="55">55 Minit</option>
+              </select>
+              <select id="outdoorSession" class="time-select" onchange="checkFormProgress()">
+                <option value="Pagi">Pagi</option>
+                <option value="Petang" selected>Petang</option>
+                <option value="Malam">Malam</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- TUNANG -->
+        <div id="group-tunang" class="event-group" style="display:none;">
+          <p style="font-size: 12px; font-weight: bold; color: #2563eb; margin-bottom: 8px;">• BERTUNANG <span id="tunangDateBadge" style="font-size:10px; color:#d97706;"></span></p>
+          
+          <div class="form-group">
+            <label>Tarikh Majlis Bertunang <span>*</span></label>
+            <input type="date" id="selectedTunangDate" class="form-control" onchange="handleTunangDateChange(this.value)">
+          </div>
+
+          <div class="form-group">
+            <label>Alamat Lokasi Bertunang <span>*</span></label>
+            <input type="text" id="tunangLoc" class="form-control" placeholder="Masukkan alamat lokasi bertunang" oninput="checkFormProgress()">
+            <p class="location-note">📌 Nota: Sila "Share Location" melalui WhatsApp untuk navigasi.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Masa Pilihan <span>*</span></label>
+            <div class="time-picker-wrapper">
+              <select id="tunangHour" class="time-select" onchange="checkFormProgress()">
+                <option value="">Jam</option>
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="tunangMinute" class="time-select" onchange="checkFormProgress()">
+                <option value="00">00 Minit</option>
+                <option value="05">05 Minit</option>
+                <option value="10">10 Minit</option>
+                <option value="15">15 Minit</option>
+                <option value="20">20 Minit</option>
+                <option value="25">25 Minit</option>
+                <option value="30">30 Minit</option>
+                <option value="35">35 Minit</option>
+                <option value="40">40 Minit</option>
+                <option value="45">45 Minit</option>
+                <option value="50">50 Minit</option>
+                <option value="55">55 Minit</option>
+              </select>
+              <select id="tunangSession" class="time-select" onchange="checkFormProgress()">
+                <option value="Pagi">Pagi</option>
+                <option value="Petang" selected>Petang</option>
+                <option value="Malam">Malam</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 05. PILIHAN PELAN BAYARAN -->
+      <div id="step-payment" class="section-box step-hidden">
+        <div class="section-title"><span>05. Pilihan Pelan Bayaran</span></div>
+
+        <div class="total-price-box">
+          <span class="label">Jumlah Keseluruhan (Total Price):</span>
+          <span id="displayTotalPrice" class="amount">RM 0</span>
+        </div>
+
+        <!-- Pelan 50% Deposit -->
+        <label class="radio-card">
+          <input type="radio" name="paymentPlan" value="50% Deposit" onclick="toggleInstallment(false)" checked>
+          <div class="info">
+            <h4><span>50% Deposit</span></h4>
+            <p>Bayar separuh deposit untuk pengesahan tarikh tempahan.</p>
+            <div id="depositBox" class="deposit-preview">
+              💡 <strong>Pecahan Bayaran 50% Deposit:</strong><br>
+              • Bayar Deposit (50%): <strong id="depositAmount">-</strong> (Perlu dibayar sekarang)<br>
+              • Baki Selepas Majlis (50%): <strong id="balanceAmount">-</strong>
+            </div>
+          </div>
+        </label>
+
+        <!-- Pelan Ansuran Fleksibel -->
+        <label class="radio-card">
+          <input type="radio" name="paymentPlan" value="Ansuran Fleksibel" onclick="toggleInstallment(true)">
+          <div class="info">
+            <h4><span>Ansuran Fleksibel</span></h4>
+            <p>1. Bayar RM200 untuk lock tarikh.<br>2. Jelaskan baki deposit permulaan dalam masa 2 minggu.<br>3. Baki akhir dibayar selepas selesai majlis.</p>
+            <div id="installmentBox" class="installment-preview">
+              📅 <strong>Jadual Bayaran Ansuran Fleksibel:</strong><br>
+              • Bayar Lock Tarikh (Hari ini): <strong>RM 200</strong><br>
+              • Baki Deposit Permulaan (<strong id="datePlusTwoWeeks">-</strong>): <strong id="flexFirstBalance">-</strong><br>
+              • Baki Selepas Majlis (50%): <strong id="flexFinalBalance">-</strong>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <div id="generalError" class="alert-box" style="margin-bottom: 15px;">⚠️ Sila lengkapkan maklumat borang dengan sempurna.</div>
+
+      <div id="actionContainer" class="step-hidden">
+        <button type="submit" id="submitBtn" class="btn-submit">
+          SUBMIT
+        </button>
+      </div>
+    </form>
+    
+    <footer>ARTIOS LUMINA STUDIO (003661074-U)</footer>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySr_AMMHuPtPco8jssRs8oeDHj9eznDpCKq7NJ_xS8iPVuAkJqmOEEXBoV_SAwuaLpZA/exec';
+    let bookedDates = [];
+    let currDate = new Date(2026, 9, 1);
+
+    function getTodayString() {
+      const todayObj = new Date();
+      return `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
+    }
+
+    function initMinDatePickers() {
+      const todayStr = getTodayString();
+      ['selectedNikahDate', 'selectedSecondDate', 'selectedTandangDate', 'selectedOutdoorDate', 'selectedTunangDate'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.setAttribute('min', todayStr);
+      });
+    }
+
+    async function fetchBookedDates() {
+      try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        const data = await response.json();
+        bookedDates = data;
+        document.getElementById('calendarLoading').textContent = '✅ Kalendar Disync';
+      } catch (error) {
+        console.error('Gagal sync kalendar:', error);
+        document.getElementById('calendarLoading').textContent = '⚠️ Gagal Sync';
+      }
+      renderCalendar();
+      initMinDatePickers();
+    }
+
+    function renderCalendar() {
+      const y = currDate.getFullYear();
+      const m = currDate.getMonth();
+      const names = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+      document.getElementById('monthYearTitle').textContent = `${names[m]} ${y}`;
+
+      const firstDay = new Date(y, m, 1).getDay();
+      const totalDays = new Date(y, m + 1, 0).getDate();
+      const grid = document.getElementById('calDaysGrid');
+      grid.innerHTML = '';
+
+      let offset = firstDay === 0 ? 6 : firstDay - 1;
+      for(let i=0; i<offset; i++) grid.appendChild(document.createElement('div'));
+
+      const todayStr = getTodayString();
+
+      for(let d=1; d<=totalDays; d++) {
+        const btn = document.createElement('div');
+        const fDate = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        
+        const isBooked = bookedDates.includes(fDate);
+        const isPast = fDate < todayStr;
+
+        btn.className = 'cal-day';
+
+        if (isPast) {
+          btn.classList.add('past');
+          btn.textContent = d;
+        } else if(isBooked) {
+          btn.classList.add('booked');
+          btn.innerHTML = `<span>${d}</span><span class="tag">FULL</span>`;
+        } else {
+          btn.textContent = d;
+        }
+        grid.appendChild(btn);
+      }
+    }
+
+    function handleNikahDateChange(val) {
+      const todayStr = getTodayString();
+      if (val && val < todayStr) {
+        alert("Maaf, tarikh ni dah lepas!");
+        document.getElementById('selectedNikahDate').value = '';
+        document.getElementById('nikahDateBadge').textContent = '';
+      } else if (bookedDates.includes(val)) {
+        alert("Maaf, tarikh ni dah fullbook!");
+        document.getElementById('selectedNikahDate').value = '';
+        document.getElementById('nikahDateBadge').textContent = '';
+      } else if(val) {
+        const parts = val.split('-');
+        const names = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+        const formatted = `${parseInt(parts[2], 10)} ${names[parseInt(parts[1], 10)-1]} ${parts[0]}`;
+        document.getElementById('nikahDateBadge').textContent = `(Tarikh Nikah: ${formatted})`;
+
+        const selectedPkg = document.querySelector('input[name="selectedPackage"]:checked');
+        if (selectedPkg && !selectedPkg.hasAttribute('data-diff')) {
+          const secondDateInput = document.getElementById('selectedSecondDate');
+          if (secondDateInput) {
+            secondDateInput.value = val;
+            handleSecondDateChange(val);
+          }
+        }
+      } else {
+        document.getElementById('nikahDateBadge').textContent = '';
+      }
+      checkFormProgress();
+    }
+
+    function handleSecondDateChange(val) {
+      const todayStr = getTodayString();
+      if (val && val < todayStr) {
+        alert("Maaf, tarikh ni dah lepas!");
+        document.getElementById('selectedSecondDate').value = '';
+        document.getElementById('sandingDateBadge').textContent = '';
+      } else if (bookedDates.includes(val)) {
+        alert("Maaf, tarikh ni dah fullbook!");
+        document.getElementById('selectedSecondDate').value = '';
+        document.getElementById('sandingDateBadge').textContent = '';
+      } else if(val) {
+        const parts = val.split('-');
+        const names = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+        const formatted = `${parseInt(parts[2], 10)} ${names[parseInt(parts[1], 10)-1]} ${parts[0]}`;
+        document.getElementById('sandingDateBadge').textContent = `(Tarikh Sanding: ${formatted})`;
+      } else {
+        document.getElementById('sandingDateBadge').textContent = '';
+      }
+      checkFormProgress();
+    }
+
+    function handleTandangDateChange(val) {
+      const todayStr = getTodayString();
+      if (val && val < todayStr) {
+        alert("Maaf, tarikh ni dah lepas!");
+        document.getElementById('selectedTandangDate').value = '';
+        document.getElementById('tandangDateBadge').textContent = '';
+      } else if (bookedDates.includes(val)) {
+        alert("Maaf, tarikh ni dah fullbook!");
+        document.getElementById('selectedTandangDate').value = '';
+        document.getElementById('tandangDateBadge').textContent = '';
+      } else if(val) {
+        const parts = val.split('-');
+        const names = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+        const formatted = `${parseInt(parts[2], 10)} ${names[parseInt(parts[1], 10)-1]} ${parts[0]}`;
+        document.getElementById('tandangDateBadge').textContent = `(Tarikh Tandang: ${formatted})`;
+      } else {
+        document.getElementById('tandangDateBadge').textContent = '';
+      }
+      checkFormProgress();
+    }
+
+    function handleOutdoorDateChange(val) {
+      const todayStr = getTodayString();
+      if (val && val < todayStr) {
+        alert("Maaf, tarikh ni dah lepas!");
+        document.getElementById('selectedOutdoorDate').value = '';
+        document.getElementById('outdoorDateBadge').textContent = '';
+      } else if (bookedDates.includes(val)) {
+        alert("Maaf, tarikh ni dah fullbook!");
+        document.getElementById('selectedOutdoorDate').value = '';
+        document.getElementById('outdoorDateBadge').textContent = '';
+      } else if(val) {
+        const parts = val.split('-');
+        const names = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+        const formatted = `${parseInt(parts[2], 10)} ${names[parseInt(parts[1], 10)-1]} ${parts[0]}`;
+        document.getElementById('outdoorDateBadge').textContent = `(Tarikh Outdoor: ${formatted})`;
+      } else {
+        document.getElementById('outdoorDateBadge').textContent = '';
+      }
+      checkFormProgress();
+    }
+
+    function handleTunangDateChange(val) {
+      const todayStr = getTodayString();
+      if (val && val < todayStr) {
+        alert("Maaf, tarikh ni dah lepas!");
+        document.getElementById('selectedTunangDate').value = '';
+        document.getElementById('tunangDateBadge').textContent = '';
+      } else if (bookedDates.includes(val)) {
+        alert("Maaf, tarikh ni dah fullbook!");
+        document.getElementById('selectedTunangDate').value = '';
+        document.getElementById('tunangDateBadge').textContent = '';
+      } else if(val) {
+        const parts = val.split('-');
+        const names = ["Januari","Februari","Mac","April","Mei","Jun","Julai","Ogos","September","Oktober","November","Disember"];
+        const formatted = `${parseInt(parts[2], 10)} ${names[parseInt(parts[1], 10)-1]} ${parts[0]}`;
+        document.getElementById('tunangDateBadge').textContent = `(Tarikh Tunang: ${formatted})`;
+      } else {
+        document.getElementById('tunangDateBadge').textContent = '';
+      }
+      checkFormProgress();
+    }
+
+    function changeMonth(delta) {
+      currDate.setMonth(currDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    function toggleAccordion(header, contentId) {
+      const content = document.getElementById(contentId);
+      const isVisible = content.style.display === 'block';
+      content.style.display = isVisible ? 'none' : 'block';
+      header.classList.toggle('active', !isVisible);
+    }
+
+    function toggleInstallment(isFlexible) {
+      const depositBox = document.getElementById('depositBox');
+      const installmentBox = document.getElementById('installmentBox');
+
+      if(isFlexible) {
+        depositBox.style.display = 'none';
+        installmentBox.style.display = 'block';
+
+        const today = new Date();
+        const twoWeeks = new Date(today);
+        twoWeeks.setDate(today.getDate() + 14);
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        document.getElementById('datePlusTwoWeeks').textContent = twoWeeks.toLocaleDateString('ms-MY', options);
+      } else {
+        depositBox.style.display = 'block';
+        installmentBox.style.display = 'none';
+      }
+    }
+
+    function checkFormProgress() {
+      const cName = document.getElementById('coupleName').value.trim();
+      const cPhone = document.getElementById('contactNumber').value.trim();
+
+      document.getElementById('step-package').style.display = (cName && cPhone) ? 'block' : 'none';
+      
+      const selectedPkg = document.querySelector('input[name="selectedPackage"]:checked');
+      if (selectedPkg) {
+        document.getElementById('step-events').style.display = 'block';
+        document.getElementById('step-payment').style.display = 'block';
+        
+        const targetEvents = selectedPkg.getAttribute('data-events').split(',');
+
+        const price = Number(selectedPkg.getAttribute('data-price'));
+        const halfPrice = price / 2;
+        const flexFirst = halfPrice - 200;
+
+        document.getElementById('displayTotalPrice').textContent = `RM ${price.toLocaleString()}`;
+        document.getElementById('depositAmount').textContent = `RM ${halfPrice.toLocaleString()}`;
+        document.getElementById('balanceAmount').textContent = `RM ${halfPrice.toLocaleString()}`;
+        document.getElementById('flexFirstBalance').textContent = `RM ${flexFirst.toLocaleString()}`;
+        document.getElementById('flexFinalBalance').textContent = `RM ${halfPrice.toLocaleString()}`;
+
+        let allFilled = true;
+        
+        targetEvents.forEach(group => {
+          const locInput = document.getElementById(group + 'Loc');
+          const hourInput = document.getElementById(group + 'Hour');
+          let dateInputId = 'selectedNikahDate';
+          if (group === 'walimah') dateInputId = 'selectedSecondDate';
+          else if (group === 'tandang') dateInputId = 'selectedTandangDate';
+          else if (group === 'outdoor') dateInputId = 'selectedOutdoorDate';
+          else if (group === 'tunang') dateInputId = 'selectedTunangDate';
+
+          const dateInput = document.getElementById(dateInputId);
+          
+          if (locInput && !locInput.value.trim()) allFilled = false;
+          if (hourInput && !hourInput.value) allFilled = false;
+          if (dateInput && dateInput.parentElement.style.display !== 'none' && !dateInput.value) allFilled = false;
+        });
+
+        if (allFilled && cName && cPhone) {
+          document.getElementById('actionContainer').style.display = 'block';
+        } else {
+          document.getElementById('actionContainer').style.display = 'none';
+        }
+      }
+    }
+
+    function updateEventVisibility() {
+      const selectedRadio = document.querySelector('input[name="selectedPackage"]:checked');
+      const targetEvents = selectedRadio ? selectedRadio.getAttribute('data-events').split(',') : [];
+      const isDifferentDates = selectedRadio ? selectedRadio.hasAttribute('data-diff') : false;
+
+      ['nikah', 'walimah', 'tandang', 'outdoor', 'tunang'].forEach(group => {
+        const el = document.getElementById(`group-${group}`);
+        if (targetEvents.includes(group)) {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+
+      const sandingDateInput = document.getElementById('selectedSecondDate');
+      const nikahDateInput = document.getElementById('selectedNikahDate');
+      
+      if (sandingDateInput) {
+        if (!isDifferentDates && targetEvents.includes('nikah') && targetEvents.includes('walimah')) {
+          sandingDateInput.disabled = true;
+          if (nikahDateInput && nikahDateInput.value) {
+            sandingDateInput.value = nikahDateInput.value;
+            handleSecondDateChange(nikahDateInput.value);
+          }
+        } else {
+          sandingDateInput.disabled = false;
+        }
+      }
+
+      checkFormProgress();
+    }
+
+    function getFormattedTimeString(prefix) {
+      const h = document.getElementById(prefix + 'Hour').value;
+      const m = document.getElementById(prefix + 'Minute').value;
+      const s = document.getElementById(prefix + 'Session').value;
+      if (!h) return '-';
+      return `${h}:${m} ${s}`;
+    }
+
+    async function submitBooking(e) {
+      e.preventDefault();
+      
+      const couple = document.getElementById('coupleName').value;
+      const phone = document.getElementById('contactNumber').value;
+      const email = document.getElementById('email').value || '-';
+      
+      const nikahDate = document.getElementById('selectedNikahDate') ? document.getElementById('selectedNikahDate').value : '';
+      const secondDate = document.getElementById('selectedSecondDate') ? document.getElementById('selectedSecondDate').value : '';
+      const tandangDate = document.getElementById('selectedTandangDate') ? document.getElementById('selectedTandangDate').value : '';
+      const outdoorDate = document.getElementById('selectedOutdoorDate') ? document.getElementById('selectedOutdoorDate').value : '';
+      const tunangDate = document.getElementById('selectedTunangDate') ? document.getElementById('selectedTunangDate').value : '';
+
+      const selectedPkg = document.querySelector('input[name="selectedPackage"]:checked');
+      const packageName = selectedPkg ? selectedPkg.value : 'Pakej Studio';
+      const priceVal = selectedPkg ? Number(selectedPkg.getAttribute('data-price')) : 0;
+      const plan = document.querySelector('input[name="paymentPlan"]:checked').value;
+      
+      const nLoc = document.getElementById('nikahLoc') ? document.getElementById('nikahLoc').value : '';
+      const nTime = getFormattedTimeString('nikah');
+      const wLoc = document.getElementById('walimahLoc') ? document.getElementById('walimahLoc').value : '';
+      const wTime = getFormattedTimeString('walimah');
+      const tLoc = document.getElementById('tandangLoc') ? document.getElementById('tandangLoc').value : '';
+      const tTime = getFormattedTimeString('tandang');
+      const oLoc = document.getElementById('outdoorLoc') ? document.getElementById('outdoorLoc').value : '';
+      const oTime = getFormattedTimeString('outdoor');
+      const tunLoc = document.getElementById('tunangLoc') ? document.getElementById('tunangLoc').value : '';
+      const tunTime = getFormattedTimeString('tunang');
+
+      const halfPrice = priceVal / 2;
+      let paymentDetails = "";
+      
+      if (plan === "50% Deposit") {
+        paymentDetails = `PELAN BAYARAN: 50% Deposit\n` +
+                         `• Jumlah Pakej: RM ${priceVal.toLocaleString()}\n` +
+                         `• Bayar Deposit (50% sekarang): RM ${halfPrice.toLocaleString()}\n` +
+                         `• Baki Selepas Majlis (50%): RM ${halfPrice.toLocaleString()}`;
+      } else {
+        const flexFirst = halfPrice - 200;
+        const today = new Date();
+        const twoWeeks = new Date(today);
+        twoWeeks.setDate(today.getDate() + 14);
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        const dateStr = twoWeeks.toLocaleDateString('ms-MY', options);
+
+        paymentDetails = `PELAN BAYARAN: Ansuran Fleksibel\n` +
+                         `• Jumlah Pakej: RM ${priceVal.toLocaleString()}\n` +
+                         `• Bayar Lock Tarikh (Hari ini): RM 200\n` +
+                         `• Baki Deposit Permulaan (${dateStr}): RM ${flexFirst.toLocaleString()}\n` +
+                         `• Baki Selepas Majlis (50%): RM ${halfPrice.toLocaleString()}`;
+      }
+
+      const clientInfoStr = `PELANGGAN: ${couple}\nNo Tel: ${phone}\nEmail: ${email}\nPakej: ${packageName}\n\n${paymentDetails}`;
+
+      try {
+        if (nikahDate && secondDate && nikahDate === secondDate) {
+          let combinedNotes = `${clientInfoStr}\n\nMAJLIS NIKAH:\n• Masa: ${nTime}\n• Lokasi: ${nLoc || '-'}\n\nMAJLIS SANDING:\n• Masa: ${wTime}\n• Lokasi: ${wLoc || '-'}`;
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ 
+              coupleName: couple + ' (Nikah & Sanding)', 
+              phone: phone, 
+              date: nikahDate, 
+              packageName: `${packageName}`, 
+              location: `Nikah: ${nLoc} | Sanding: ${wLoc}`, 
+              notes: combinedNotes 
+            })
+          });
+        } else {
+          if (nikahDate && nLoc) {
+            let nikahNotes = `${clientInfoStr}\n\nMAJLIS NIKAH:\n• Tarikh: ${nikahDate}\n• Lokasi: ${nLoc || '-'}\n• Masa: ${nTime}`;
+            await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify({ coupleName: couple + ' (Nikah)', phone: phone, date: nikahDate, packageName: `${packageName} - Nikah`, location: nLoc, notes: nikahNotes })
+            });
+          }
+          if (secondDate && wLoc) {
+            let sandingNotes = `${clientInfoStr}\n\nMAJLIS SANDING:\n• Tarikh: ${secondDate}\n• Lokasi: ${wLoc || '-'}\n• Masa: ${wTime}`;
+            await fetch(APPS_SCRIPT_URL, {
+              method: 'POST',
+              body: JSON.stringify({ coupleName: couple + ' (Sanding)', phone: phone, date: secondDate, packageName: `${packageName} - Sanding`, location: wLoc, notes: sandingNotes })
+            });
+          }
+        }
+
+        if (tandangDate && tLoc) {
+          let tandangNotes = `${clientInfoStr}\n\nMAJLIS TANDANG:\n• Tarikh: ${tandangDate}\n• Lokasi: ${tLoc || '-'}\n• Masa: ${tTime}`;
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ coupleName: couple + ' (Tandang)', phone: phone, date: tandangDate, packageName: `${packageName} - Tandang`, location: tLoc, notes: tandangNotes })
+          });
+        }
+
+        if (outdoorDate && oLoc) {
+          let outdoorNotes = `${clientInfoStr}\n\nSESI OUTDOOR:\n• Tarikh: ${outdoorDate}\n• Lokasi: ${oLoc || '-'}\n• Masa: ${oTime}`;
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ coupleName: couple + ' (Outdoor)', phone: phone, date: outdoorDate, packageName: `${packageName} - Outdoor`, location: oLoc, notes: outdoorNotes })
+          });
+        }
+
+        if (tunangDate && tunLoc) {
+          let tunangNotes = `${clientInfoStr}\n\nMAJLIS BERTUNANG:\n• Tarikh: ${tunangDate}\n• Lokasi: ${tunLoc || '-'}\n• Masa: ${tunTime}`;
+          await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({ coupleName: couple + ' (Tunang)', phone: phone, date: tunangDate, packageName: `${packageName} - Tunang`, location: tunLoc, notes: tunangNotes })
+          });
+        }
+
+        alert('✨ Tempahan berjaya disimpan dan dicalendar-kan dengan sempurna!');
+        location.reload();
+      } catch (error) {
+        console.error('Ralat simpan kalendar:', error);
+        alert('⚠️ Gagal berhubung dengan Apps Script.');
+      }
+    }
+
+    fetchBookedDates();
+  </script>
+</body>
+</html>
